@@ -51,36 +51,112 @@ class snake {
     }
   }
 
-  moves(direction) {
+  moves(direction, food) {
+    if (!direction) {
+      return;
+    }
+
     let head = this.body[0];
     let newHead;
+
     switch (direction) {
       case "ArrowUp":
       case "w":
       case "ц":
-        newHead = new cells(head.x, head.y - 1);
-        this.body.unshift(newHead);
+        if (
+          // проверка в каком направлении может быть следующее движение змейки например если двежится в право то не может повернуть на лево
+          this.direction == "s" ||
+          this.direction == "ArrowDown" ||
+          this.direction == "ы"
+        ) {
+          newHead = new cells(head.x, head.y + 1);
+          this.body.unshift(newHead);
+        } else {
+          newHead = new cells(head.x, head.y - 1);
+          this.body.unshift(newHead);
+          this.direction = direction;
+        }
         break;
       case "ArrowRight":
       case "d":
       case "в":
-        newHead = new cells(head.x + 1, head.y);
-        this.body.unshift(newHead);
+        if (
+          this.direction == "a" ||
+          this.direction == "ArrowLeft" ||
+          this.direction == "ф"
+        ) {
+          newHead = new cells(head.x - 1, head.y);
+          this.body.unshift(newHead);
+        } else {
+          newHead = new cells(head.x + 1, head.y);
+          this.body.unshift(newHead);
+          this.direction = direction;
+        }
         break;
       case "ArrowDown":
       case "s":
       case "ы":
-        newHead = new cells(head.x, head.y + 1);
-        this.body.unshift(newHead);
+        if (
+          this.direction == "w" ||
+          this.direction == "ArrowUp" ||
+          this.direction == "ц"
+        ) {
+          newHead = new cells(head.x, head.y - 1);
+          this.body.unshift(newHead);
+        } else {
+          newHead = new cells(head.x, head.y + 1);
+          this.body.unshift(newHead);
+          this.direction = direction;
+        }
         break;
       case "ArrowLeft":
       case "a":
       case "ф":
-        newHead = new cells(head.x - 1, head.y);
-        this.body.unshift(newHead);
+        if (
+          this.direction == "d" ||
+          this.direction == "ArrowRight" ||
+          this.direction == "в"
+        ) {
+          newHead = new cells(head.x + 1, head.y);
+          this.body.unshift(newHead);
+        } else {
+          newHead = new cells(head.x - 1, head.y);
+          this.body.unshift(newHead);
+          this.direction = direction;
+        }
         break;
-      default:
-        break;
+    }
+
+    //если съел еду и если не съел
+    if (this.direction) {
+      if (gameIsRunning == true) {
+        if (!this.foodConsuming(food)) {
+          this.body.pop();
+        } else {
+          food.spawn(this, true);
+        }
+      }
+
+      // проверка не ударилась ли змея в себя
+      for (let i = 1; i < this.body.length - 1; i++) {
+        if (newHead.x == this.body[i].x && newHead.y == this.body[i].y) {
+          gameIsRunning = false;
+          console.log("Game over");
+          return;
+        }
+      }
+
+      //границы поля
+      if (newHead.x < 0 || newHead.y < 0) {
+        gameIsRunning = false;
+        console.log("Game over");
+      } else if (
+        newHead.x > gameBoard.width / cellSize - 1 ||
+        newHead.y > gameBoard.height / cellSize - 1
+      ) {
+        gameIsRunning = false;
+        console.log("Game over");
+      }
     }
   }
 }
@@ -148,70 +224,6 @@ const drawing = {
 Object.assign(snake.prototype, drawing);
 Object.assign(food.prototype, drawing);
 
-function legalMoves(snake, direction) {
-  // проверка в каком направлении может быть следующее движение змейки например если двежится в право то не может повернуть на лево
-  switch (snake.direction) {
-    case "ArrowUp":
-    case "w":
-    case "ц":
-      if (direction == "s" || direction == "ArrowDown" || direction == "ы") {
-        break;
-      } else {
-        snake.direction = direction;
-      }
-      break;
-    case "ArrowRight":
-    case "d":
-    case "в":
-      if (direction == "a" || direction == "ArrowLeft" || direction == "ф") {
-        break;
-      } else {
-        snake.direction = direction;
-      }
-      break;
-    case "ArrowDown":
-    case "s":
-    case "ы":
-      if (direction == "w" || direction == "ArrowUp" || direction == "ц") {
-        break;
-      } else {
-        snake.direction = direction;
-      }
-      break;
-    case "ArrowLeft":
-    case "a":
-    case "ф":
-      if (direction == "d" || direction == "ArrowRight" || direction == "в") {
-        break;
-      } else {
-        snake.direction = direction;
-      }
-      break;
-    default:
-      snake.direction = direction;
-  }
-}
-
-function border(snake) {
-  //границы поля и проверка не ударилась ли змея в себя
-  let head = snake.body[0];
-  for (let i = 1; i < snake.body.length - 1; i++) {
-    if (head.x == snake.body[i].x && head.y == snake.body[i].y) {
-      gameIsRunning = false;
-      console.log("Game over");
-    } else if (head.x < 0 || head.y < 0) {
-      gameIsRunning = false;
-      console.log("Game over");
-    } else if (
-      head.x > gameBoard.width / cellSize - 1 ||
-      head.y > gameBoard.height / cellSize - 1
-    ) {
-      gameIsRunning = false;
-      console.log("Game over");
-    }
-  }
-}
-
 function drawGame(ctx, snake, food) {
   ctx.clearRect(0, 0, gameBoard.width, gameBoard.height);
   snake.draw(ctx, food, snake, snake);
@@ -221,7 +233,7 @@ function drawGame(ctx, snake, food) {
 let frames;
 let counter = 0;
 
-function animation(ctx, snake, food, direction) {
+function animation(ctx, snake, food) {
   //анимация
   clearInterval(frames);
   frames = setInterval(() => {
@@ -232,44 +244,39 @@ function animation(ctx, snake, food, direction) {
       return;
     }
 
+    ctx.clearRect(
+      food.position.x * cellSize,
+      food.position.y * cellSize,
+      cellSize,
+      cellSize
+    );
     drawGame(ctx, snake, food);
-    border(snake);
-    snake.moves(direction);
-
-    if (snake.foodConsuming(food)) {
-      counter += 1;
-      score.innerHTML = counter;
-      ctx.clearRect(
-        food.position.x * cellSize,
-        food.position.y * cellSize,
-        cellSize,
-        cellSize
-      );
-      food.spawn(snake, snake.foodConsuming(food));
-    } else {
-      snake.body.pop();
-    }
-  }, 40);
+    python.moves(currentKey, food);
+  }, 150);
 }
 
 let python = new snake();
 let apple = new food();
+
 apple.spawn(python, python.foodConsuming(apple));
 
 let gameIsRunning = false;
+let currentKey = null;
 
 playBtn.addEventListener("click", () => {
   playBtn.classList.add("hideElement");
   resetBtn.classList.remove("hideElement");
-  drawGame(ctx, python, apple);
+  gameIsRunning = true;
+  animation(ctx, python, apple);
+
   window.addEventListener("keydown", (e) => {
     //проверка не зажата ли клавиша
     if (!e.repeat) {
       for (let i = 0; i < validKeys.length - 1; i++) {
         if (e.key == validKeys[i]) {
-          gameIsRunning = true;
-          legalMoves(python, e.key);
-          animation(ctx, python, apple, python.direction);
+          // python.moves(e.key, apple);
+          // animation(ctx, python, apple, python.direction);
+          currentKey = e.key;
           break;
         }
       }
