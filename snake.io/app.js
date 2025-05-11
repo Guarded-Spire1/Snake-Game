@@ -273,8 +273,6 @@ playBtn.addEventListener("click", () => {
     if (!e.repeat) {
       for (let i = 0; i < validKeys.length - 1; i++) {
         if (e.key == validKeys[i]) {
-          // python.moves(e.key, apple);
-          // animation(ctx, python, apple, python.direction);
           currentKey = e.key;
           break;
         }
