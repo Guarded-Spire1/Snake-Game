@@ -1,6 +1,5 @@
 const gameBoard = document.getElementById("gameBoard");
 const ctx = gameBoard.getContext("2d");
-const score = document.getElementById("score");
 const resetBtn = document.getElementById("resetBtn");
 const playBtn = document.getElementById("beginGame");
 const cellSize = 26; //размер одного квадратика поля
@@ -134,6 +133,7 @@ class snake {
           this.body.pop();
         } else {
           food.spawn(this, true);
+          counter++;
         }
       }
 
@@ -231,7 +231,6 @@ function drawGame(ctx, snake, food) {
 }
 
 let frames;
-let counter = 0;
 
 function animation(ctx, snake, food) {
   //анимация

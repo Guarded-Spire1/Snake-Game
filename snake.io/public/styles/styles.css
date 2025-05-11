@@ -39,6 +39,8 @@ body {
 #gameBoard {
   border: 1px solid #000;
   background-color: rgb(110, 154, 28);
+  left: 50%;
+  top: 50%;
 }
 
 #score {
@@ -50,6 +52,8 @@ body {
 }
 
 .btn {
+  position: inherit;
+  top: 92%;
   font-family: "Atma", system-ui;
   font-weight: 700;
   font-style: normal;
