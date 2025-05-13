@@ -137,7 +137,7 @@ class snake {
       }
 
       // проверка не ударилась ли змея в себя
-      for (let i = 1; i < this.body.length - 1; i++) {
+      for (let i = 1; i < this.body.length; i++) {
         if (newHead.x == this.body[i].x && newHead.y == this.body[i].y) {
           gameIsRunning = false;
           console.log("Game over");
@@ -229,10 +229,9 @@ function drawGame(ctx, snake, food) {
   food.draw(ctx, food, snake, food);
 }
 
-let frames;
-
 function animation(ctx, snake, food) {
   //анимация
+  let frames;
   clearInterval(frames);
   frames = setInterval(() => {
     if (!gameIsRunning) {
