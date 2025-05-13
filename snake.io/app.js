@@ -20,7 +20,7 @@ const validKeys = [
 
 let gameIsRunning = true;
 
-class cells {
+class Cells {
   //даёт каждому объекту координаты Х и Y
   constructor(x, y) {
     this.x = x;
@@ -28,9 +28,9 @@ class cells {
   }
 }
 
-class snake {
+class Snake {
   constructor() {
-    this.body = [new cells(2, 0), new cells(1, 0), new cells(0, 0)];
+    this.body = [new Cells(2, 0), new Cells(1, 0), new Cells(0, 0)];
     this.direction = null;
   }
 
@@ -70,10 +70,10 @@ class snake {
           this.direction == "ArrowDown" ||
           this.direction == "ы"
         ) {
-          newHead = new cells(head.x, head.y + 1);
+          newHead = new Cells(head.x, head.y + 1);
           this.body.unshift(newHead);
         } else {
-          newHead = new cells(head.x, head.y - 1);
+          newHead = new Cells(head.x, head.y - 1);
           this.body.unshift(newHead);
           this.direction = direction;
         }
@@ -86,10 +86,10 @@ class snake {
           this.direction == "ArrowLeft" ||
           this.direction == "ф"
         ) {
-          newHead = new cells(head.x - 1, head.y);
+          newHead = new Cells(head.x - 1, head.y);
           this.body.unshift(newHead);
         } else {
-          newHead = new cells(head.x + 1, head.y);
+          newHead = new Cells(head.x + 1, head.y);
           this.body.unshift(newHead);
           this.direction = direction;
         }
@@ -102,10 +102,10 @@ class snake {
           this.direction == "ArrowUp" ||
           this.direction == "ц"
         ) {
-          newHead = new cells(head.x, head.y - 1);
+          newHead = new Cells(head.x, head.y - 1);
           this.body.unshift(newHead);
         } else {
-          newHead = new cells(head.x, head.y + 1);
+          newHead = new Cells(head.x, head.y + 1);
           this.body.unshift(newHead);
           this.direction = direction;
         }
@@ -118,10 +118,10 @@ class snake {
           this.direction == "ArrowRight" ||
           this.direction == "в"
         ) {
-          newHead = new cells(head.x + 1, head.y);
+          newHead = new Cells(head.x + 1, head.y);
           this.body.unshift(newHead);
         } else {
-          newHead = new cells(head.x - 1, head.y);
+          newHead = new Cells(head.x - 1, head.y);
           this.body.unshift(newHead);
           this.direction = direction;
         }
@@ -162,9 +162,9 @@ class snake {
   }
 }
 
-class food {
+class Food {
   constructor() {
-    this.position = new cells(
+    this.position = new Cells(
       Math.floor(Math.random() * 22) + 3, //случайно выбирает клетку кроме первый трех где спавнится змея
       Math.floor(Math.random() * 22) + 3
     );
@@ -194,21 +194,21 @@ class food {
 const drawing = {
   //объект дающий методы отрисовки для объектов созданных по классам змеи и еды
   draw(ctx, foodObj, snakeObj, object) {
-    if (object instanceof food) {
+    if (object instanceof Food) {
       foodObj.spawn(snakeObj);
-      ctx.fillStyle = food.color;
+      ctx.fillStyle = Food.color;
       ctx.fillRect(
         foodObj.position.x * cellSize,
         foodObj.position.y * cellSize,
         cellSize,
         cellSize
       );
-    } else if (object instanceof snake) {
+    } else if (object instanceof Snake) {
       for (let i = 0; i < snakeObj.body.length; i++) {
         if (i == 0) {
-          ctx.fillStyle = snake.headColor;
+          ctx.fillStyle = Snake.headColor;
         } else {
-          ctx.fillStyle = snake.bodyColor;
+          ctx.fillStyle = Snake.bodyColor;
         }
 
         ctx.fillRect(
@@ -222,8 +222,8 @@ const drawing = {
   },
 };
 
-Object.assign(snake.prototype, drawing);
-Object.assign(food.prototype, drawing);
+Object.assign(Snake.prototype, drawing);
+Object.assign(Food.prototype, drawing);
 
 class Animation {
   constructor(snake, food, ctx) {
@@ -266,28 +266,56 @@ class Animation {
   }
 }
 
-let python = new snake();
-let apple = new food();
-let animation = new Animation(python, apple, ctx);
+class StartGame {
+  constructor(snake, food, animation) {
+    this.snake = snake;
+    this.food = food;
+    this.animation = animation;
+  }
 
-playBtn.addEventListener("click", () => {
-  playBtn.classList.add("hideElement");
-  resetBtn.classList.remove("hideElement");
+  static validKeys = [
+    "a",
+    "s",
+    "d",
+    "w",
+    "ф",
+    "ы",
+    "в",
+    "ц",
+    "ArrowUp",
+    "ArrowRight",
+    "ArrowDown",
+    "ArrowLeft",
+  ];
 
-  apple.spawn(python, python.foodConsuming(apple));
-  animation.start();
+  begin() {
+    playBtn.classList.add("hideElement");
+    resetBtn.classList.remove("hideElement");
 
-  window.addEventListener("keydown", (e) => {
-    //проверка не зажата ли клавиша
-    if (!e.repeat) {
-      for (let i = 0; i < validKeys.length - 1; i++) {
-        if (e.key == validKeys[i]) {
-          animation.update(e.key);
-          break;
+    this.food.spawn(this.snake, this.snake.foodConsuming(this.food));
+    this.animation.start();
+
+    window.addEventListener("keydown", (e) => {
+      //проверка не зажата ли клавиша
+      if (!e.repeat) {
+        for (let i = 0; i < validKeys.length - 1; i++) {
+          if (e.key == validKeys[i]) {
+            animation.update(e.key);
+            break;
+          }
         }
       }
-    }
-  });
+    });
+  }
+}
+
+let python = new Snake();
+let apple = new Food();
+let animation = new Animation(python, apple, ctx);
+let game = new StartGame(python, apple, animation);
+
+playBtn.addEventListener("click", () => {
+  game.begin();
 });
 
 resetBtn.addEventListener("click", () => {
