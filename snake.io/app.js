@@ -250,7 +250,7 @@ function animation(ctx, snake, food) {
       cellSize
     );
     drawGame(ctx, snake, food);
-    python.moves(currentKey, food);
+    snake.moves(currentKey, food);
   }, 150);
 }
 
