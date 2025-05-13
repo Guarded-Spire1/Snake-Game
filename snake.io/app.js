@@ -309,10 +309,10 @@ class StartGame {
   }
 }
 
-let python = new Snake();
-let apple = new Food();
-let animation = new Animation(python, apple, ctx);
-let game = new StartGame(python, apple, animation);
+const python = new Snake();
+const apple = new Food();
+const animation = new Animation(python, apple, ctx);
+const game = new StartGame(python, apple, animation);
 
 playBtn.addEventListener("click", () => {
   game.begin();
