@@ -163,7 +163,7 @@ class snake {
 class food {
   constructor() {
     this.position = new cells(
-      Math.floor(Math.random() * 22) + 3,
+      Math.floor(Math.random() * 22) + 3, //случайно выбирает клетку кроме первый трех где спавнится змея
       Math.floor(Math.random() * 22) + 3
     );
   }
