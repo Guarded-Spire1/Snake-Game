@@ -133,7 +133,6 @@ class snake {
           this.body.pop();
         } else {
           food.spawn(this, true);
-          counter++;
         }
       }
 
