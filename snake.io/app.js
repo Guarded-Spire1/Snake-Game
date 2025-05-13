@@ -18,6 +18,8 @@ const validKeys = [
   "ArrowLeft",
 ];
 
+let gameIsRunning = true;
+
 class cells {
   //даёт каждому объекту координаты Х и Y
   constructor(x, y) {
@@ -223,55 +225,64 @@ const drawing = {
 Object.assign(snake.prototype, drawing);
 Object.assign(food.prototype, drawing);
 
-function drawGame(ctx, snake, food) {
-  ctx.clearRect(0, 0, gameBoard.width, gameBoard.height);
-  snake.draw(ctx, food, snake, snake);
-  food.draw(ctx, food, snake, food);
-}
+class Animation {
+  constructor(snake, food, ctx) {
+    this.snake = snake;
+    this.food = food;
+    this.ctx = ctx;
+    this.frames = null;
+    this.currentKey = null;
+  }
 
-function animation(ctx, snake, food) {
-  //анимация
-  let frames;
-  clearInterval(frames);
-  frames = setInterval(() => {
-    if (!gameIsRunning) {
-      clearInterval(frames);
-      gameBoard.style.display = "none";
-      document.getElementById("gameOver").style.display = "block";
-      return;
-    }
+  update(key) {
+    this.currentKey = key;
+  }
 
-    ctx.clearRect(
-      food.position.x * cellSize,
-      food.position.y * cellSize,
-      cellSize,
-      cellSize
-    );
-    drawGame(ctx, snake, food);
-    snake.moves(currentKey, food);
-  }, 150);
+  draw() {
+    this.ctx.clearRect(0, 0, gameBoard.width, gameBoard.height);
+    this.snake.draw(this.ctx, this.food, this.snake, this.snake);
+    this.food.draw(this.ctx, this.food, this.snake, this.food);
+  }
+
+  start() {
+    frames = setInterval(() => {
+      if (!gameIsRunning) {
+        clearInterval(frames);
+        gameBoard.style.display = "none";
+        document.getElementById("gameOver").style.display = "block";
+        return;
+      }
+
+      this.ctx.clearRect(
+        this.food.position.x * cellSize,
+        this.food.position.y * cellSize,
+        cellSize,
+        cellSize
+      );
+
+      this.draw();
+      this.snake.moves(this.currentKey, this.food);
+    }, 150);
+  }
 }
 
 let python = new snake();
 let apple = new food();
-
-apple.spawn(python, python.foodConsuming(apple));
-
-let gameIsRunning = false;
-let currentKey = null;
+let animation = new Animation(python, apple, ctx);
 
 playBtn.addEventListener("click", () => {
   playBtn.classList.add("hideElement");
   resetBtn.classList.remove("hideElement");
-  gameIsRunning = true;
-  animation(ctx, python, apple);
+
+  apple.spawn(python, python.foodConsuming(apple));
+  animation.start();
 
   window.addEventListener("keydown", (e) => {
     //проверка не зажата ли клавиша
     if (!e.repeat) {
       for (let i = 0; i < validKeys.length - 1; i++) {
         if (e.key == validKeys[i]) {
-          currentKey = e.key;
+          animation.update(e.key);
           break;
         }
       }
