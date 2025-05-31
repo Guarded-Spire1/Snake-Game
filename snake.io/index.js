@@ -3,6 +3,7 @@ const ctx = gameBoard.getContext("2d");
 const resetBtn = document.getElementById("resetBtn");
 const playBtn = document.getElementById("beginGame");
 const cellSize = 26;
+const cellsAmount = 25;
 const validKeys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 
 function isEqual(a, b) {
@@ -59,7 +60,7 @@ class Snake {
     //Проверка врезалась в себя или границы
     const snakeHead = this.body[0];
     if (snakeHead.x < 0 || snakeHead.y < 0) return false;
-    if (snakeHead.x >= cellSize || snakeHead.y >= cellSize) return false;
+    if (snakeHead.x >= cellsAmount || snakeHead.y >= cellsAmount) return false;
 
     for (let i = 1; i < this.body.length; i++) {
       const segment = this.body[i];
@@ -73,8 +74,8 @@ class Snake {
 class Apple {
   constructor() {
     this.position = new Cells(
-      Math.floor(Math.random() * cellSize),
-      Math.floor(Math.random() * cellSize)
+      Math.floor(Math.random() * cellsAmount),
+      Math.floor(Math.random() * cellsAmount)
     );
   }
 
@@ -89,8 +90,8 @@ class Apple {
 
   updateCoordinates() {
     this.position = new Cells(
-      Math.floor(Math.random() * cellSize),
-      Math.floor(Math.random() * cellSize)
+      Math.floor(Math.random() * cellsAmount),
+      Math.floor(Math.random() * cellsAmount)
     );
   }
 }
