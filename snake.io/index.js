@@ -147,7 +147,7 @@ class Game {
     this.apple = apple;
     this.render = render;
     this.isGameOver = false;
-    this.frames;
+    this.frames = null;
   }
   //проверка логики движений, в каком направлении может быть следующее движение змейки например если двежится в право то не может повернуть на лево
   handleKey(keyPress) {
